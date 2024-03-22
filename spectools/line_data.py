@@ -66,6 +66,10 @@ def get_Elevels(line):
 
 def level_diagram(line:str) -> None :
     ion,_ = line.split('_')
+    idx_num = utils.first_numid(ion)
+    element = ion[:idx_num]
+    ion_state = int(ion[idx_num:])
+    ion_roman = element+utils.int_to_roman(ion_state)
     df_group = get_Elevels(line)
     
 #     if ion=='HI':
@@ -144,7 +148,7 @@ def level_diagram(line:str) -> None :
         j_str[idx_levels[::-1][i]] = f"{str(Js[i]):>{pad_jterm}}"
 
     # print diagram ion title
-    print(f"{indent}{ion:^{ncols}}")
+    print(f"{indent}{ion_roman:^{ncols}}")
 
     # print grid to console
     for i,gridline in enumerate(grid):
