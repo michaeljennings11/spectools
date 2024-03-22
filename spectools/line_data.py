@@ -33,7 +33,7 @@ You may download the {element}.csv from the NIST webpage if it is available\n\
 and place it in the NIST_lines directory.")
 
 def load_ionDataFrame(ion):
-    idx_num = [i for i,char in enumerate(ion) if char.isdigit()][0]
+    idx_num = utils.first_numid(ion)
     element = ion[:idx_num]
     df = load_elementDataFrame(element)
     ion_state = int(ion[idx_num:])
