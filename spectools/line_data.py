@@ -2,17 +2,10 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata
+from spectools import utils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 NIST_lines_dir = os.path.join(dir_path,'NIST_lines')
-
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx],idx
-
-def nlayers(n):
-    return 2*n-1
 
 def load_elementDataFrame(element):
     full_key_names = ['element','ion','wave','A','f','Acc','El','Eu','confl','terml','Jl','confu','termu','Ju']
@@ -55,7 +48,7 @@ def load_lineDataFrame(line_name,return_df=False):
     ion,line = line_name.split('_')
     df = load_ionDataFrame(ion)
     line_list = df['wave'].values
-    _,idx = find_nearest(line_list,float(line))
+    _,idx = utils.find_nearest(line_list,float(line))
     df_line = df.iloc[idx]
     if return_df:
         return df_line,df
@@ -114,8 +107,8 @@ def level_diagram(line:str) -> None :
     indent = f"{'':{pad_lines}}"
 
     # formatting indices
-    idx_ulevels = np.arange(0,nlayers(nupper),2)
-    idx_llevels = -(np.arange(0,nlayers(nlower),2)[::-1]+1)
+    idx_ulevels = np.arange(0,utils.nlayers(nupper),2)
+    idx_llevels = -(np.arange(0,utils.nlayers(nlower),2)[::-1]+1)
     idx_levels = np.concatenate((idx_ulevels,idx_llevels))
     idx_lines = np.arange(int(pad_lines/2),pad_lines*nlines,pad_lines)
     idx_kterm = int(np.median(idx_ulevels))
@@ -129,7 +122,7 @@ def level_diagram(line:str) -> None :
         idx_up[i] = (idx_levels[::-1][Eu_rank[i]])+1
 
     # create level diagram grid
-    nrows = nlayers(nupper)+nmiddle+nlayers(nlower)
+    nrows = utils.nlayers(nupper)+nmiddle+utils.nlayers(nlower)
     ncols = nlines*pad_lines
     grid = np.empty((nrows,ncols+pad_ikterm),dtype=object)
     grid[:] = ' ' # fill grid with single spaces
