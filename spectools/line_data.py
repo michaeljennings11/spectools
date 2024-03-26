@@ -1,7 +1,9 @@
 import os
+
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata
+
 from spectools import utils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
