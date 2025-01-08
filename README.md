@@ -11,7 +11,7 @@ python -m pip install --user -e .
 
 ## Usage (ver 0.0.1)
 Currently, only spectroscopic line data tools are implemented. All spectroscopic line data is
-stored in csv files by element taken from the NIST website.
+stored in csv files by element taken from the [NIST](https://www.nist.gov/pml/atomic-spectra-database) website.
 ```python
 from spectools import line_data as ld
 
