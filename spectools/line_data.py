@@ -151,7 +151,8 @@ def level_diagram(line: str) -> None:
     idx_ulevels = np.arange(0, utils.nlayers(nupper), 2)
     idx_llevels = -(np.arange(0, utils.nlayers(nlower), 2)[::-1] + 1)
     idx_levels = np.concatenate((idx_ulevels, idx_llevels))
-    idx_lines = np.arange(int(pad_lines / 2), pad_lines * nlines, pad_lines)
+    idx_linesl = np.arange(int(pad_lines / 2), pad_lines * nlines, pad_lines) - 1
+    idx_linesr = np.arange(int(pad_lines / 2), pad_lines * nlines, pad_lines)
     idx_kterm = int(np.median(idx_ulevels))
     idx_iterm = int(np.median(idx_llevels))
     idx_kiterm = np.array([idx_kterm, idx_iterm])
@@ -168,12 +169,17 @@ def level_diagram(line: str) -> None:
     grid = np.empty((nrows, ncols + pad_ikterm), dtype=object)
     grid[:] = " "  # fill grid with single spaces
     for i in range(nlines):
-        grid[idx_up[i] : idx_down[i], idx_lines[i]] = (
+        # left side
+        grid[idx_up[i] : idx_down[i] + 1, idx_linesl[i]] = (
+            "|"  # fill level transition arrow bars
+        )
+        # right side
+        grid[idx_up[i] - 1 : idx_down[i], idx_linesr[i]] = (
             "|"  # fill level transition arrow bars
         )
     grid[idx_levels, :-pad_ikterm] = "-"  # fill energy level dashes
-    grid[idx_down, idx_lines] = "v"  # fill lower level arrow caps
-    grid[idx_up, idx_lines] = "^"  # fill upper level arrow caps
+    grid[idx_down, idx_linesr] = "v"  # fill lower level arrow caps
+    grid[idx_up, idx_linesl] = "^"  # fill upper level arrow caps
     for i, kiterm in enumerate(kiterms):
         grid[idx_kiterm[i], -1] = kiterm  # fill kiterms to right side of grid
 
