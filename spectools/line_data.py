@@ -200,7 +200,7 @@ def level_diagram(line: str) -> None:
         print(f"{energy_str[i]:>{pad_lines}}" + "".join(gridline) + j_str[i])
 
     # print line wavelengths under grid
-    lines_str = "".join([f"{str(w_line)+'A':^{pad_lines}}" for w_line in w_lines])
+    lines_str = "".join([f"{str(w_line)+u'\u212B':^{pad_lines}}" for w_line in w_lines])
     print(f"{indent}{lines_str}")
 
 
