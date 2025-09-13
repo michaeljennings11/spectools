@@ -8,16 +8,9 @@ Documentation is available online at https://github.com/michaeljennings11/specto
 
 from spectools.version import version as __version__
 
-submodules = [
-    "get_Elevels",
-    "level_diagram",
-    "load_elementDataFrame",
-    "load_ionDataFrame",
-    "load_lineDataFrame",
-]
+submodules = ["line_data", "line_model", "constants", "utils"]
 
 __all__ = submodules + [
-    "LineData",
     "__version__",
 ]
 
