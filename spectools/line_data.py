@@ -101,6 +101,30 @@ def get_Elevels(line):
     return df_group
 
 
+def get_transitionProbabilities(line):
+    df_group = get_Elevels(line)
+    ntrans = len(df_group)
+    Jis = df_group["Jl"].values
+    Jks = df_group["Ju"].values
+    Ji_set = np.unique(Jis)
+    Jk_set = np.unique(Jks)
+    Ji_pairs = Ji_set
+    Jk_pairs = Jk_set
+    id_lower_pairs = [np.argwhere(Jis == Ji_pair).ravel() for Ji_pair in Ji_pairs]
+    id_upper_pairs = [np.argwhere(Jks == Jk_pair).ravel() for Jk_pair in Jk_pairs]
+    prob_up = np.zeros(ntrans)
+    for i, id_lower_pair in enumerate(id_lower_pairs):
+        A_lower_pair = df_group["A"].values[id_lower_pair]
+        prob_upward_pair = A_lower_pair / A_lower_pair.sum()
+        prob_up[id_lower_pairs[i]] = prob_upward_pair
+    prob_down = np.zeros(ntrans)
+    for i, id_upper_pair in enumerate(id_upper_pairs):
+        A_upper_pair = df_group["A"].values[id_upper_pair]
+        prob_downward_pair = A_upper_pair / A_upper_pair.sum()
+        prob_down[id_upper_pairs[i]] = prob_downward_pair
+    return prob_up, prob_down
+
+
 def level_diagram(line: str) -> None:
     ion, _ = line.split("_")
     idx_num = utils.first_numid(ion)
@@ -108,6 +132,7 @@ def level_diagram(line: str) -> None:
     ion_state = int(ion[idx_num:])
     ion_roman = element + utils.int_to_roman(ion_state)
     df_group = get_Elevels(line)
+    p_ups, p_dns = get_transitionProbabilities(line)
 
     #     if ion=='HI':
     #         wave_label = 'ritz_wl_vac(A)'
@@ -166,6 +191,11 @@ def level_diagram(line: str) -> None:
     # create level diagram grid
     nrows = utils.nlayers(nupper) + nmiddle + utils.nlayers(nlower)
     ncols = nlines * pad_lines
+
+    # idx_uprob = utils.nlayers(nupper) + nmiddle//2 - 1
+    idx_uprob = idx_ulevels + 2
+    idx_dprob = idx_llevels - 2
+
     grid = np.empty((nrows, ncols + pad_ikterm), dtype=object)
     grid[:] = " "  # fill grid with single spaces
     for i in range(nlines):
@@ -173,10 +203,24 @@ def level_diagram(line: str) -> None:
         grid[idx_up[i] : idx_down[i] + 1, idx_linesl[i]] = (
             "|"  # fill level transition arrow bars
         )
+        p_up = p_ups[i]
+        if p_up == 1.0:
+            p_str = np.array(list("100%"))
+            grid[idx_uprob, idx_linesl[i] - 4 : idx_linesl[i]] = p_str
+        else:
+            p_str = np.array(list(str(round(p_ups[i], 3) * 100) + "%"))
+            grid[idx_uprob, idx_linesl[i] - 5 : idx_linesl[i]] = p_str
         # right side
         grid[idx_up[i] - 1 : idx_down[i], idx_linesr[i]] = (
             "|"  # fill level transition arrow bars
         )
+        p_dn = p_dns[i]
+        if p_dn == 1.0:
+            p_str = np.array(list("100%"))
+            grid[idx_dprob, idx_linesr[i] + 1 : idx_linesr[i] + 5] = p_str
+        else:
+            p_str = np.array(list(str(round(p_dns[i], 3) * 100) + "%"))
+            grid[idx_dprob, idx_linesr[i] + 1 : idx_linesr[i] + 6] = p_str
     grid[idx_levels, :-pad_ikterm] = "-"  # fill energy level dashes
     grid[idx_down, idx_linesr] = "v"  # fill lower level arrow caps
     grid[idx_up, idx_linesl] = "^"  # fill upper level arrow caps
