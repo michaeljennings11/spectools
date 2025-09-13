@@ -1,7 +1,6 @@
 import numpy as np
 
-C_CMS = 2.99792e10  # speed of light [cm/s]
-C_KMS = 2.99792e5  # speed of light [km/s]
+from spectools import constants
 
 ROMAN = [
     (1000, "M"),
@@ -44,7 +43,7 @@ def nlayers(n):
 
 
 def w_doppler(v, lambda_s):
-    lambda_o = lambda_s * (v / C_KMS + 1.0)
+    lambda_o = lambda_s * (v / constants.C_KMS + 1.0)
     return lambda_o
 
 
