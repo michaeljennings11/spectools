@@ -12,6 +12,7 @@ python -m pip install -e .
 ## Usage (ver 0.1.0)
 Currently, only spectroscopic line data and line models are implemented. 
 
+### line_data
 All spectroscopic line data is
 stored in csv files by element taken from the [NIST](https://www.nist.gov/pml/atomic-spectra-database) website.
 ```python
@@ -31,6 +32,7 @@ SiII_1260.print_leveldiagram()
 ```
 ![](SiII_1260_leveldiagram.png)
 
+### line_model
 ```python
 from spectools import line_model as lm
 
