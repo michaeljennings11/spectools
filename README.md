@@ -36,7 +36,7 @@ SiII_1260.print_leveldiagram()
 ```python
 from spectools import line_model as lm
 
-# create instance of LineData class for the SiII 1260Angstrom line
+# create instance of LineModel class for the SiII 1260Angstrom line
 vm = lm.VoigtModel("Si2_1260")
 gm = lm.GaussianModel("Si2_1260")
 
