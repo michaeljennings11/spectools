@@ -9,8 +9,10 @@ cd spectools
 python -m pip install -e .
 ```
 
-## Usage (ver 0.0.1)
-Currently, only spectroscopic line data tools are implemented. All spectroscopic line data is
+## Usage (ver 0.1.0)
+Currently, only spectroscopic line data and line models are implemented. 
+
+All spectroscopic line data is
 stored in csv files by element taken from the [NIST](https://www.nist.gov/pml/atomic-spectra-database) website.
 ```python
 from spectools import line_data as ld
@@ -28,3 +30,23 @@ f = SiII_1260.f # oscillator strength of line transition
 SiII_1260.print_leveldiagram()
 ```
 ![](SiII_1260_leveldiagram.png)
+
+```python
+from spectools import line_model as lm
+
+# create instance of LineData class for the SiII 1260Angstrom line
+vm = lm.VoigtModel("Si2_1260")
+gm = lm.GaussianModel("Si2_1260")
+
+# set absorption profile parameters
+b = 100     # doppler parameter
+log_n = 14  # log of ion column density
+cf = 0.8    # covering fraction
+vout = -100 # line-of-sight velocity
+
+# get absoption profiles
+w_vm, f_vm = vm.abs_profile(b,log_n,vout)
+w_gm, f_gm = gm.abs_profile(b,log_n,vout)
+```
+Below are example Voigt and Gaussian absorption profiles.
+![](SiII_1260_profiles.png)
