@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from spectools import constants, line_data, utils
+from spectools import constants, line_data, process
 
 
 class LineModel:
@@ -19,7 +19,7 @@ class LineModel:
             self.v_arr = np.arange(-1000, 1000 + self.vres, self.vres)
         else:
             self.v_arr = v_arr
-        self.wave_arr = utils.w_doppler(self.v_arr, self.wave)
+        self.wave_arr = process.w_doppler(self.v_arr, self.wave)
         self.flux_arr = None
 
 
