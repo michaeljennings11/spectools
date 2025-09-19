@@ -3,26 +3,58 @@ import numpy as np
 from spectools import constants
 
 
-def v_doppler(lambda_obs, lambda_source: float):
-    """Converts from wavelength space to velocity space by Doppler shift."""
+def v_doppler(lambda_obs: np.ndarray, lambda_source: np.ndarray) -> np.ndarray:
+    """Calculates Doppler shift in km/s of observed wavelength
+       compared to source wavelength.
+
+    .. math::
+        v = c (\\lambda_obs/\\lambda_source - 1)
+    """
+    lambda_obs = np.asarray(lambda_obs)
+    lambda_source = np.asarray(lambda_source)
+    if np.any(lambda_obs <= 0):
+        raise ValueError("Wavelength values lambda_obs must be greater than zero.")
+    if np.any(lambda_source <= 0):
+        raise ValueError("Wavelength values lambda_source must be greater than zero.")
+
+    if lambda_source.ndim > 0:
+        lambda_source = lambda_source[:, None]
+
     velocity = constants.C_KMS * (lambda_obs / lambda_source - 1.0)
+
     return velocity
 
 
-def w_doppler(velocity, lambda_source: float):
-    """Converts from velocity space to wavelength space by Doppler shift."""
+def w_doppler(velocity: np.ndarray, lambda_source: np.ndarray) -> np.ndarray:
+    """Calculates wavelength in Angstroms from Doppler shift in km/s
+       relative to source wavelength.
+
+    .. math::
+        \\lambda_obs = \\lambda_source (v / c + 1)
+    """
+    velocity = np.asarray(velocity)
+    lambda_source = np.asarray(lambda_source)
+    if np.any(lambda_source <= 0):
+        raise ValueError("Wavelength values lambda_source must be greater than zero.")
+
+    if lambda_source.ndim > 0:
+        lambda_source = lambda_source[:, None]
+
     lambda_obs = lambda_source * (velocity / constants.C_KMS + 1.0)
+
     return lambda_obs
 
 
-def dl_doppler(velocity, lambda_source: float):
+def dw_doppler(velocity: float, lambda_source: float) -> float:
     """Calculates Doppler shifted wavelength interval.
 
     .. math::
         \\Delta{\\lambda} = \\lambda_0 (v / c)
     """
-    dl = lambda_source * (velocity / constants.C_KMS)
-    return dl
+    if lambda_source <= 0:
+        raise ValueError("Wavelength value lambda_source must be greater than zero.")
+    dw = lambda_source * (velocity / constants.C_KMS)
+    return dw
 
 
 def z_correct(lambda_obs: np.ndarray, z: np.ndarray) -> np.ndarray:
