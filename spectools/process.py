@@ -93,11 +93,21 @@ def z_project(lambda_rest: np.ndarray, z: np.ndarray) -> np.ndarray:
     return lambda_rest * (1.0 + z)
 
 
-def convolve_gauss(x, y, sigma: float):
-    y_conv = []
-    for xs in x:
-        gkv = np.exp(-((x - xs) ** 2) / (2 * (sigma**2)))
-        gkv /= gkv.sum()
-        y_conv.append((y * gkv).sum())
+def kernel_smooth(x, y, params, method="gaussian"):
+    """Implements kernel smoothing on the input (x,y) data.
+    Returns the smoothed y data.
+    """
+    s = x.reshape(-1, 1)
+    t = x.reshape(1, -1)
+    match method:
+        case "gaussian":
+            sigma = params
+            cov_kernel = np.exp(-((s - t) ** 2) / (2 * (sigma**2)))
+        case _:
+            raise ValueError(
+                f'Kernel smoothing method of "{method}" not implemented. Choose "gaussian".'
+            )
 
-    return y_conv
+    k_norm = 1 / cov_kernel.sum(axis=0)
+    yhat = (cov_kernel @ y) * k_norm
+    return yhat
