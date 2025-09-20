@@ -189,3 +189,90 @@ class GaussianModel(LineModel):
             ydata = tau
 
         return xdata, ydata
+
+
+class LorentzModel(LineModel):
+    def __init__(self, line_name, v_arr=None, vres=None):
+        super().__init__(line_name, v_arr=None, vres=None)
+
+    def abs_profile(
+        self,
+        log_n: float,
+        vout: float = 0,
+        cf: float = 1,
+        wave_arr: np.ndarray = None,
+        xspace: str = "wavelength",
+        yspace: str = "flux",
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Calculates absorption profile from the radiative transfer equation assuming only absorption.
+        CAUTION: ONLY CORRECT FOR RESONANCE LINES WITH ONE UPPER STATE LEVEL! NEED TO GENERALIZE.
+
+        Parameters
+        ----------
+        log_n : float
+            Logarithm of ion column density in cm^-2.
+        vout : float, optional
+            Line-of-sight velocity in km/s (default value is 0.).
+        cf : float, optional
+            Ion line-of-sight covering fraction between 0-1 for a partial covering model
+            (default value is 1.).
+        wave_arr : np.ndarray, optional
+            Input wavelength array in Angstroms to calculate absorption profile at.
+            This is helpful when wanting to match the wavelength array of existing data to compare
+            profiles.
+        xspace : str, optional
+            Specify which variable space ("wavelength" or "velocity") to output xdata in
+            (default value is "wavelength").
+        yspace : str, optional
+            Specify which variable space ("flux" or "tau") to output ydata in
+            (default value is "flux").
+        """
+        if cf < 0 or cf > 1:
+            raise ValueError("cf must be in range [0,1]")
+
+        wave0 = self.wave
+        f = self.f
+        A = self.A
+        if wave_arr == None:
+            wave_arr = self.wave_arr
+
+        N = 10**log_n
+        gamma_ul = A
+        x0 = wave0 * (
+            (vout * 1e5) / C_CMS + 1.0
+        )  # wavelength from line center in Angstroms
+        phi = (
+            4
+            * gamma_ul
+            / (
+                16 * np.pi**2 * C_CMS**2 * 1.0e8**2 * (1 / wave_arr - 1 / x0) ** 2
+                + gamma_ul**2
+            )
+        )  # line profile function
+        sigma_cross = (
+            np.pi * E**2 * f / M_E / C_CMS * phi
+        )  # ion cross section in wavelength space
+        tau = sigma_cross * N  # optical depth
+        self.flux_arr = (
+            cf * np.exp(-tau) + 1 - cf
+        )  # normalized flux assuming partial covering
+
+        if xspace == "wavelength":
+            xdata = wave_arr
+        elif xspace == "velocity":
+            xdata = self.v_arr
+        else:
+            raise ValueError(
+                f"{xspace} is not a valid value for xspace; supported values are 'wavelength', 'velocity'"
+            )
+
+        if yspace == "flux":
+            ydata = self.flux_arr
+        elif yspace == "tau":
+            ydata = tau
+        else:
+            raise ValueError(
+                f"{yspace} is not a valid value for xspace; supported values are 'flux', 'tau'"
+            )
+
+        return xdata, ydata
