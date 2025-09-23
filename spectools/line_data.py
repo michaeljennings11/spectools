@@ -142,10 +142,10 @@ def get_transitionProbabilities(line):
 
 
 def level_diagram(line: str) -> None:
-    if line_name[:2] == "Ly":
-        ion, _ = "H1", lyman_series[line_name]
+    if line[:2] == "Ly":
+        ion, _ = "H1", lyman_series[line]
     else:
-        ion, _ = line_name.split("_")
+        ion, _ = line.split("_")
     idx_num = utils.first_numid(ion)
     element = ion[:idx_num]
     ion_state = int(ion[idx_num:])
