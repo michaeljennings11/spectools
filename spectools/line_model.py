@@ -194,6 +194,9 @@ class GaussianModel(LineModel):
 class LorentzModel(LineModel):
     def __init__(self, line_name, v_arr=None, vres=None):
         super().__init__(line_name, v_arr=None, vres=None)
+        print(
+            "CAUTION: Only correct for resonance lines with only one upper state level (e.g SiII 1260)!"
+        )
 
     def abs_profile(
         self,
