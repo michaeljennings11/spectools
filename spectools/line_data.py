@@ -9,6 +9,19 @@ from spectools import utils
 dir_path = os.path.dirname(os.path.realpath(__file__))
 NIST_lines_dir = os.path.join(dir_path, "NIST_lines")
 
+lyman_series = {
+    "LyA": 1215.6,
+    "LyB": 1025.7,
+    "Ly4": 972.5,
+    "Ly5": 949.7,
+    "Ly6": 937.8,
+    "Ly7": 930.7,
+    "Ly8": 926.2,
+    "Ly9": 923.1,
+    "Ly10": 920.96,
+    "Ly11": 919.35,
+}
+
 
 def load_elementDataFrame(element):
     full_key_names = [
@@ -75,7 +88,10 @@ def load_ionDataFrame(ion):
 
 
 def load_lineDataFrame(line_name, return_df=False):
-    ion, line = line_name.split("_")
+    if line_name[:2] == "Ly":
+        ion, line = "H1", lyman_series[line_name]
+    else:
+        ion, line = line_name.split("_")
     df = load_ionDataFrame(ion)
     line_list = df["wave"].values
     _, idx = utils.find_nearest(line_list, float(line))
@@ -126,7 +142,10 @@ def get_transitionProbabilities(line):
 
 
 def level_diagram(line: str) -> None:
-    ion, _ = line.split("_")
+    if line_name[:2] == "Ly":
+        ion, _ = "H1", lyman_series[line_name]
+    else:
+        ion, _ = line_name.split("_")
     idx_num = utils.first_numid(ion)
     element = ion[:idx_num]
     ion_state = int(ion[idx_num:])
