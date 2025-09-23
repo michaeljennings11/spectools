@@ -111,3 +111,20 @@ def kernel_smooth(x, y, params, method="gaussian"):
     k_norm = 1 / cov_kernel.sum(axis=0)
     yhat = (cov_kernel @ y) * k_norm
     return yhat
+
+
+def add_noise(y, mu, std, method="flat"):
+    """Adds Gaussian noise to input data y."""
+    noise = np.random.normal(mu, std, y.shape)
+    match method:
+        case "flat":
+            coef = 1.0
+        case "poisson":
+            coef = np.sqrt(y)
+        case _:
+            raise ValueError(
+                f'{method} method not implemented. Choose "flat", "poisson".'
+            )
+    y_noise = y + coef * noise
+    y_noise[y_noise < 0] = 0
+    return y_noise
