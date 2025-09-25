@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from spectools import constants, line_data, process
 
@@ -15,7 +14,7 @@ class LineModel:
             self.vres = 1
         else:
             self.vres = vres
-        if v_arr == None:
+        if v_arr is None:
             self.v_arr = np.arange(-1000, 1000 + self.vres, self.vres)
         else:
             self.v_arr = v_arr
@@ -97,7 +96,7 @@ class VoigtModel(LineModel):
         wave0 = self.wave
         f = self.f
         A = self.A
-        if wave_arr == None:
+        if wave_arr is None:
             wave_arr = self.wave_arr
 
         N = 10**log_n
@@ -123,7 +122,7 @@ class VoigtModel(LineModel):
         if xspace == "wavelength":
             xdata = wave_arr
         elif xspace == "velocity":
-            xdata = v_arr
+            xdata = self.v_arr
         if yspace == "flux":
             ydata = self.flux_arr
         elif yspace == "tau":
@@ -150,8 +149,7 @@ class GaussianModel(LineModel):
 
         wave0 = self.wave
         f = self.f
-        A = self.A
-        if wave_arr == None:
+        if wave_arr is None:
             wave_arr = self.wave_arr
 
         N = 10**log_n
@@ -182,7 +180,7 @@ class GaussianModel(LineModel):
         if xspace == "wavelength":
             xdata = wave_arr
         elif xspace == "velocity":
-            xdata = v_arr
+            xdata = self.v_arr
         if yspace == "flux":
             ydata = self.flux_arr
         elif yspace == "tau":
@@ -236,24 +234,24 @@ class LorentzModel(LineModel):
         wave0 = self.wave
         f = self.f
         A = self.A
-        if wave_arr == None:
+        if wave_arr is None:
             wave_arr = self.wave_arr
 
         N = 10**log_n
         gamma_ul = A
         x0 = wave0 * (
-            (vout * 1e5) / C_CMS + 1.0
+            (vout * 1e5) / constants.C_CMS + 1.0
         )  # wavelength from line center in Angstroms
         phi = (
             4
             * gamma_ul
             / (
-                16 * np.pi**2 * C_CMS**2 * 1.0e8**2 * (1 / wave_arr - 1 / x0) ** 2
+                16 * np.pi**2 * constants.C_CMS**2 * 1.0e8**2 * (1 / wave_arr - 1 / x0) ** 2
                 + gamma_ul**2
             )
         )  # line profile function
         sigma_cross = (
-            np.pi * E**2 * f / M_E / C_CMS * phi
+            np.pi * constants.E**2 * f / constants.M_E / constants.C_CMS * phi
         )  # ion cross section in wavelength space
         tau = sigma_cross * N  # optical depth
         self.flux_arr = (
