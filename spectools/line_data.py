@@ -180,7 +180,6 @@ def level_diagram(line: str) -> None:
     E_set = sorted(El_set.union(Eu_set))
     nlower = len(El_set)
     nupper = len(Eu_set)
-    nlevels = len(E_set)
     El_rank = rankdata(Elowers, method="dense") - 1
     Eu_rank = rankdata(Euppers, method="dense") + (nlower - 1)
 
