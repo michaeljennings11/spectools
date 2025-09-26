@@ -13,9 +13,11 @@ def v_doppler(lambda_obs: np.ndarray, lambda_source: np.ndarray) -> np.ndarray:
     lambda_obs = np.asarray(lambda_obs)
     lambda_source = np.asarray(lambda_source)
     if np.any(lambda_obs <= 0):
-        raise ValueError("Wavelength values lambda_obs must be greater than zero.")
+        raise ValueError(
+            "Wavelength values lambda_obs must be greater than zero.")
     if np.any(lambda_source <= 0):
-        raise ValueError("Wavelength values lambda_source must be greater than zero.")
+        raise ValueError(
+            "Wavelength values lambda_source must be greater than zero.")
 
     if lambda_source.ndim > 0:
         lambda_source = lambda_source[:, None]
@@ -35,7 +37,8 @@ def w_doppler(velocity: np.ndarray, lambda_source: np.ndarray) -> np.ndarray:
     velocity = np.asarray(velocity)
     lambda_source = np.asarray(lambda_source)
     if np.any(lambda_source <= 0):
-        raise ValueError("Wavelength values lambda_source must be greater than zero.")
+        raise ValueError(
+            "Wavelength values lambda_source must be greater than zero.")
 
     if lambda_source.ndim > 0:
         lambda_source = lambda_source[:, None]
@@ -52,7 +55,8 @@ def dw_doppler(velocity: float, lambda_source: float) -> float:
         \\Delta{\\lambda} = \\lambda_0 (v / c)
     """
     if lambda_source <= 0:
-        raise ValueError("Wavelength value lambda_source must be greater than zero.")
+        raise ValueError(
+            "Wavelength value lambda_source must be greater than zero.")
     dw = lambda_source * (velocity / constants.C_KMS)
     return dw
 
@@ -66,7 +70,8 @@ def z_correct(lambda_obs: np.ndarray, z: np.ndarray) -> np.ndarray:
     lambda_obs = np.asarray(lambda_obs)
     z = np.asarray(z)
     if np.any(lambda_obs <= 0):
-        raise ValueError("Wavelength value lambda_obs must be greater than zero.")
+        raise ValueError(
+            "Wavelength value lambda_obs must be greater than zero.")
     if np.any(z < 0):
         raise ValueError("Redshift z must be positive.")
 
@@ -84,7 +89,8 @@ def z_project(lambda_rest: np.ndarray, z: np.ndarray) -> np.ndarray:
     lambda_rest = np.asarray(lambda_rest)
     z = np.asarray(z)
     if np.any(lambda_rest <= 0):
-        raise ValueError("Wavelength values lambda_rest must be greater than zero.")
+        raise ValueError(
+            "Wavelength values lambda_rest must be greater than zero.")
     if np.any(z < 0):
         raise ValueError("Redshift z must be positive.")
 

@@ -51,7 +51,8 @@ class VoigtModel(LineModel):
             1.82106170570,
         ]
         z = x**2
-        conditions = [z <= 3, (z > 3) & (z < 25), z >= 25]  # piecewise conditions
+        conditions = [z <= 3, (z > 3) & (z < 25), z >=
+                      25]  # piecewise conditions
 
         def H1(z: np.ndarray) -> np.ndarray:
             return np.exp(-z) * (
@@ -59,7 +60,8 @@ class VoigtModel(LineModel):
                 - a
                 * (
                     Ai[0]
-                    + Ai[1] / (z - Ai[2] + Ai[3] / (z - Ai[4] + Ai[5] / (z - Ai[6])))
+                    + Ai[1] / (z - Ai[2] + Ai[3] /
+                               (z - Ai[4] + Ai[5] / (z - Ai[6])))
                 )
             )
 
@@ -70,7 +72,8 @@ class VoigtModel(LineModel):
                 / (
                     z
                     - Bi[2]
-                    + Bi[3] / (z + Bi[4] + Bi[5] / (z - Bi[6] + Bi[7] / (z - Bi[8])))
+                    + Bi[3] / (z + Bi[4] + Bi[5] /
+                               (z - Bi[6] + Bi[7] / (z - Bi[8])))
                 )
             )
 
@@ -246,7 +249,11 @@ class LorentzModel(LineModel):
             4
             * gamma_ul
             / (
-                16 * np.pi**2 * constants.C_CMS**2 * 1.0e8**2 * (1 / wave_arr - 1 / x0) ** 2
+                16
+                * np.pi**2
+                * constants.C_CMS**2
+                * 1.0e8**2
+                * (1 / wave_arr - 1 / x0) ** 2
                 + gamma_ul**2
             )
         )  # line profile function

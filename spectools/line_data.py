@@ -52,7 +52,8 @@ def load_elementDataFrame(element):
         df = (
             pd.read_csv(file, usecols=np.arange(0, ncols + 1))
             .replace(
-                ["=", '"', r"\[", r"\]", r"\(", r"\)", r"\+x", r"\?", "&dagger", ";"],
+                ["=", '"', r"\[", r"\]",
+                    r"\(", r"\)", r"\+x", r"\?", "&dagger", ";"],
                 ["", "", "", "", "", "", "", "", "", ""],
                 regex=True,
             )
@@ -126,8 +127,10 @@ def get_transitionProbabilities(line):
     Jk_set = np.unique(Jks)
     Ji_pairs = Ji_set
     Jk_pairs = Jk_set
-    id_lower_pairs = [np.argwhere(Jis == Ji_pair).ravel() for Ji_pair in Ji_pairs]
-    id_upper_pairs = [np.argwhere(Jks == Jk_pair).ravel() for Jk_pair in Jk_pairs]
+    id_lower_pairs = [np.argwhere(Jis == Ji_pair).ravel()
+                      for Ji_pair in Ji_pairs]
+    id_upper_pairs = [np.argwhere(Jks == Jk_pair).ravel()
+                      for Jk_pair in Jk_pairs]
     prob_up = np.zeros(ntrans)
     for i, id_lower_pair in enumerate(id_lower_pairs):
         A_lower_pair = df_group["A"].values[id_lower_pair]
@@ -194,7 +197,8 @@ def level_diagram(line: str) -> None:
     idx_ulevels = np.arange(0, utils.nlayers(nupper), 2)
     idx_llevels = -(np.arange(0, utils.nlayers(nlower), 2)[::-1] + 1)
     idx_levels = np.concatenate((idx_ulevels, idx_llevels))
-    idx_linesl = np.arange(int(pad_lines / 2), pad_lines * nlines, pad_lines) - 1
+    idx_linesl = np.arange(
+        int(pad_lines / 2), pad_lines * nlines, pad_lines) - 1
     idx_linesr = np.arange(int(pad_lines / 2), pad_lines * nlines, pad_lines)
     idx_kterm = int(np.median(idx_ulevels))
     idx_iterm = int(np.median(idx_llevels))
@@ -218,27 +222,27 @@ def level_diagram(line: str) -> None:
     grid[:] = " "  # fill grid with single spaces
     for i in range(nlines):
         # left side
-        grid[idx_up[i] : idx_down[i] + 1, idx_linesl[i]] = (
+        grid[idx_up[i]: idx_down[i] + 1, idx_linesl[i]] = (
             "|"  # fill level transition arrow bars
         )
         p_up = p_ups[i]
         if p_up == 1.0:
             p_str = np.array(list("100%"))
-            grid[idx_uprob, idx_linesl[i] - 4 : idx_linesl[i]] = p_str
+            grid[idx_uprob, idx_linesl[i] - 4: idx_linesl[i]] = p_str
         else:
             p_str = np.array(list(str(round(p_ups[i], 3) * 100) + "%"))
-            grid[idx_uprob, idx_linesl[i] - 5 : idx_linesl[i]] = p_str
+            grid[idx_uprob, idx_linesl[i] - 5: idx_linesl[i]] = p_str
         # right side
-        grid[idx_up[i] - 1 : idx_down[i], idx_linesr[i]] = (
+        grid[idx_up[i] - 1: idx_down[i], idx_linesr[i]] = (
             "|"  # fill level transition arrow bars
         )
         p_dn = p_dns[i]
         if p_dn == 1.0:
             p_str = np.array(list("100%"))
-            grid[idx_dprob, idx_linesr[i] + 1 : idx_linesr[i] + 5] = p_str
+            grid[idx_dprob, idx_linesr[i] + 1: idx_linesr[i] + 5] = p_str
         else:
             p_str = np.array(list(str(round(p_dns[i], 3) * 100) + "%"))
-            grid[idx_dprob, idx_linesr[i] + 1 : idx_linesr[i] + 6] = p_str
+            grid[idx_dprob, idx_linesr[i] + 1: idx_linesr[i] + 6] = p_str
     grid[idx_levels, :-pad_ikterm] = "-"  # fill energy level dashes
     grid[idx_down, idx_linesr] = "v"  # fill lower level arrow caps
     grid[idx_up, idx_linesl] = "^"  # fill upper level arrow caps
@@ -263,7 +267,8 @@ def level_diagram(line: str) -> None:
 
     # print line wavelengths under grid
     lines_str = "".join(
-        ["{:^{}}".format(str(w_line) + "\u212b", pad_lines) for w_line in w_lines]
+        ["{:^{}}".format(str(w_line) + "\u212b", pad_lines)
+         for w_line in w_lines]
     )
     print(f"{indent}{lines_str}")
 
