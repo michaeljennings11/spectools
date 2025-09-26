@@ -126,11 +126,11 @@ def add_noise(y, mu, std, method="flat"):
         case "flat":
             coef = 1.0
         case "poisson":
-            coef = np.sqrt(y)
+            coef = np.sqrt(y)  # Poisson statistics
         case _:
             raise ValueError(
                 f'{method} method not implemented. Choose "flat", "poisson".'
             )
     y_noise = y + coef * noise
-    y_noise[y_noise < 0] = 0
+    y_noise[y_noise < 0] = 0  # ensure no non-physical values
     return y_noise
