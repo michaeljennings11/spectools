@@ -134,3 +134,26 @@ def add_noise(y, mu, std, method="flat"):
     y_noise = y + coef * noise
     y_noise[y_noise < 0] = 0  # ensure no non-physical values
     return y_noise
+
+
+def measure_ew(w, f, line_wavelength, vleft=-1000, vright=600):
+    """Measures the equivalent width in Angstroms given a velocity range window.
+    """
+    vleft, vright = np.asarray(vleft), np.asarray(vright)
+    if vleft.ndim == 1:
+        vleft = vleft[:, None]
+    if vright.ndim == 1:
+        vright = vright[:, None]
+    if w.ndim == 1:
+        w = w.reshape(1, -1)
+    if f.ndim == 1:
+        f = f.reshape(1, -1)
+    v = v_doppler(w, line_wavelength)
+    dw = np.unique(np.diff(w), axis=1)[:, 0]
+
+    vrange = (v >= vleft) & (v <= vright)
+    f_fixed = np.where(vrange, f, np.nan)
+    EW_i = np.subtract(1, f_fixed)*dw[:, np.newaxis]
+    EW = np.nansum(EW_i, axis=1)
+
+    return EW
