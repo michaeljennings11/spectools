@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from spectools import constants, line_data, process
 
@@ -15,7 +14,7 @@ class LineModel:
             self.vres = 1
         else:
             self.vres = vres
-        if v_arr == None:
+        if v_arr is None:
             self.v_arr = np.arange(-1000, 1000 + self.vres, self.vres)
         else:
             self.v_arr = v_arr
@@ -52,7 +51,8 @@ class VoigtModel(LineModel):
             1.82106170570,
         ]
         z = x**2
-        conditions = [z <= 3, (z > 3) & (z < 25), z >= 25]  # piecewise conditions
+        conditions = [z <= 3, (z > 3) & (z < 25), z >=
+                      25]  # piecewise conditions
 
         def H1(z: np.ndarray) -> np.ndarray:
             return np.exp(-z) * (
@@ -60,7 +60,8 @@ class VoigtModel(LineModel):
                 - a
                 * (
                     Ai[0]
-                    + Ai[1] / (z - Ai[2] + Ai[3] / (z - Ai[4] + Ai[5] / (z - Ai[6])))
+                    + Ai[1] / (z - Ai[2] + Ai[3] /
+                               (z - Ai[4] + Ai[5] / (z - Ai[6])))
                 )
             )
 
@@ -71,7 +72,8 @@ class VoigtModel(LineModel):
                 / (
                     z
                     - Bi[2]
-                    + Bi[3] / (z + Bi[4] + Bi[5] / (z - Bi[6] + Bi[7] / (z - Bi[8])))
+                    + Bi[3] / (z + Bi[4] + Bi[5] /
+                               (z - Bi[6] + Bi[7] / (z - Bi[8])))
                 )
             )
 
@@ -97,7 +99,7 @@ class VoigtModel(LineModel):
         wave0 = self.wave
         f = self.f
         A = self.A
-        if wave_arr == None:
+        if wave_arr is None:
             wave_arr = self.wave_arr
 
         N = 10**log_n
@@ -123,7 +125,7 @@ class VoigtModel(LineModel):
         if xspace == "wavelength":
             xdata = wave_arr
         elif xspace == "velocity":
-            xdata = v_arr
+            xdata = self.v_arr
         if yspace == "flux":
             ydata = self.flux_arr
         elif yspace == "tau":
@@ -150,8 +152,7 @@ class GaussianModel(LineModel):
 
         wave0 = self.wave
         f = self.f
-        A = self.A
-        if wave_arr == None:
+        if wave_arr is None:
             wave_arr = self.wave_arr
 
         N = 10**log_n
@@ -182,10 +183,104 @@ class GaussianModel(LineModel):
         if xspace == "wavelength":
             xdata = wave_arr
         elif xspace == "velocity":
-            xdata = v_arr
+            xdata = self.v_arr
         if yspace == "flux":
             ydata = self.flux_arr
         elif yspace == "tau":
             ydata = tau
+
+        return xdata, ydata
+
+
+class LorentzModel(LineModel):
+    def __init__(self, line_name, v_arr=None, vres=None):
+        super().__init__(line_name, v_arr=None, vres=None)
+        print(
+            "CAUTION: Only correct for resonance lines with only one upper state level (e.g SiII 1260)!"
+        )
+
+    def abs_profile(
+        self,
+        log_n: float,
+        vout: float = 0,
+        cf: float = 1,
+        wave_arr: np.ndarray = None,
+        xspace: str = "wavelength",
+        yspace: str = "flux",
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Calculates absorption profile from the radiative transfer equation assuming only absorption.
+        CAUTION: ONLY CORRECT FOR RESONANCE LINES WITH ONE UPPER STATE LEVEL! NEED TO GENERALIZE.
+
+        Parameters
+        ----------
+        log_n : float
+            Logarithm of ion column density in cm^-2.
+        vout : float, optional
+            Line-of-sight velocity in km/s (default value is 0.).
+        cf : float, optional
+            Ion line-of-sight covering fraction between 0-1 for a partial covering model
+            (default value is 1.).
+        wave_arr : np.ndarray, optional
+            Input wavelength array in Angstroms to calculate absorption profile at.
+            This is helpful when wanting to match the wavelength array of existing data to compare
+            profiles.
+        xspace : str, optional
+            Specify which variable space ("wavelength" or "velocity") to output xdata in
+            (default value is "wavelength").
+        yspace : str, optional
+            Specify which variable space ("flux" or "tau") to output ydata in
+            (default value is "flux").
+        """
+        if cf < 0 or cf > 1:
+            raise ValueError("cf must be in range [0,1]")
+
+        wave0 = self.wave
+        f = self.f
+        A = self.A
+        if wave_arr is None:
+            wave_arr = self.wave_arr
+
+        N = 10**log_n
+        gamma_ul = A
+        x0 = wave0 * (
+            (vout * 1e5) / constants.C_CMS + 1.0
+        )  # wavelength from line center in Angstroms
+        phi = (
+            4
+            * gamma_ul
+            / (
+                16
+                * np.pi**2
+                * constants.C_CMS**2
+                * 1.0e8**2
+                * (1 / wave_arr - 1 / x0) ** 2
+                + gamma_ul**2
+            )
+        )  # line profile function
+        sigma_cross = (
+            np.pi * constants.E**2 * f / constants.M_E / constants.C_CMS * phi
+        )  # ion cross section in wavelength space
+        tau = sigma_cross * N  # optical depth
+        self.flux_arr = (
+            cf * np.exp(-tau) + 1 - cf
+        )  # normalized flux assuming partial covering
+
+        if xspace == "wavelength":
+            xdata = wave_arr
+        elif xspace == "velocity":
+            xdata = self.v_arr
+        else:
+            raise ValueError(
+                f"{xspace} is not a valid value for xspace; supported values are 'wavelength', 'velocity'"
+            )
+
+        if yspace == "flux":
+            ydata = self.flux_arr
+        elif yspace == "tau":
+            ydata = tau
+        else:
+            raise ValueError(
+                f"{yspace} is not a valid value for xspace; supported values are 'flux', 'tau'"
+            )
 
         return xdata, ydata

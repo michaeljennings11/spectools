@@ -9,8 +9,8 @@ cd spectools
 python -m pip install -e .
 ```
 
-## Usage (ver 0.1.0)
-Currently, only spectroscopic line data and line models are implemented. 
+## Usage (ver 0.2.0)
+Currently, only spectroscopic line data, line models and spectrum processing modules are implemented. 
 
 ### line_data
 All spectroscopic line data is
@@ -52,3 +52,20 @@ w_gm, f_gm = gm.abs_profile(b,log_n,vout)
 ```
 Below are example Voigt and Gaussian absorption profiles.
 ![](SiII_1260_profiles.png)
+
+### process
+```python
+from spectools import process
+
+wave, flux = # spectrum data to load
+
+# correct for redshift and convert to velocity space
+z = 0.0003 # redshift
+wave_rest = process.z_correct(wave,z=z)
+velocity_rest = process.v_doppler(wave_rest,SiII_1260.wave)
+
+# downgrade resolution (e.g. to match instrument resolution)
+sig_res = 100 # gaussian std deviation in km/s for kernal smoother
+flux_smooth = process.kernel_smooth(velocity_rest,flux,sig_res)
+```
+![](process_spectrum.png)

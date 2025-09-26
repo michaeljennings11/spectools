@@ -1,7 +1,5 @@
 import numpy as np
 
-from spectools import constants
-
 ROMAN = [
     (1000, "M"),
     (900, "CM"),
