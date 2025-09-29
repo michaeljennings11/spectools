@@ -1,5 +1,8 @@
 # The spectools Project
 spectools is a Python package of helpful data and functions for working with astronomical spectroscopic data.
+I developed spectools in order to efficiently process and analyze large amounts (270,000 lines) of mock simulated galaxy spectra
+in the following paper:
+    [A Simulated Galaxy Laboratory: Exploring the Observational Effects on UV Spectral Absorption Line Measurements (2025)](https://iopscience.iop.org/article/10.3847/1538-4357/ad9b13)
 
 ## Installation
 To build spectools from source, clone the repository and install with pip.
